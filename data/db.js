@@ -18,6 +18,7 @@ function find() {
 }
 
 function findById(id) {
+  // return Promise.reject();
   return db('posts').where({ id: Number(id) });
 }
 
