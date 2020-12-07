@@ -52,21 +52,49 @@ router.get(`/api/posts/:id/comments`, (req, res) => {
     })
 })
 router.post(`/api/posts`, (req, res) => {
-  posts.findById(req.params.id)
-    .then(() => {
+  if (!req.body.title || !req.body.contents) {
+    return res.status(400).json({
+      errorMessage: "Please provide title and contents for the post.",
+    });
+  }
 
+  posts.insert(req.body)
+    .then((post) => {
+      res.status(201).json(post);
     })
     .catch((err) => {
-
+      console.log(err);
+      res.status(500).json({
+        error: "There was an error while saving the post to the database",
+      });
     })
 })
 router.post(`/api/posts/:id/comments`, (req, res) => {
+  if (!req.body.text) {
+    return res.status(400).json({
+      errorMessage: "Please provide text for the comment.",
+    });
+  }
   posts.findById(req.params.id)
-    .then(() => {
+    .then((post) => {
+      // console.log(post)
+      if (!post[0]) {
+        return res.status(404).json({
+          message: "The post with the specified ID does not exist.",
+        });
+      }
+    })
 
+  posts.insertComment(req.body)
+    .then((comment) => {
+      // console.log(comment)
+      res.status(201).json(comment);
     })
     .catch((err) => {
-
+      console.log(err);
+      res.status(500).json({
+        error: "There was an error while saving the comment to the database",
+      });
     })
 })
 router.put(`/api/posts/:id`, (req, res) => {
